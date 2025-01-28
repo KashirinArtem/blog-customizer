@@ -44,7 +44,9 @@ export const Select = (props: SelectProps) => {
 		setIsOpen(false);
 		onChange?.(option, type);
 	};
-	const handlePlaceHolderClick: MouseEventHandler<HTMLDivElement> = () => {
+	const handlePlaceHolderClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		e.stopPropagation();
+
 		setIsOpen((isOpen) => !isOpen);
 	};
 
@@ -70,7 +72,7 @@ export const Select = (props: SelectProps) => {
 					)}
 					data-status={status}
 					data-selected={!!selected?.value}
-					onClick={handlePlaceHolderClick}
+					onClick={(e) => handlePlaceHolderClick(e)}
 					role='button'
 					tabIndex={0}
 					ref={placeholderRef}>
@@ -91,7 +93,7 @@ export const Select = (props: SelectProps) => {
 								<Option
 									key={option.value}
 									option={option}
-									onClick={() => handleOptionClick(option)}
+									onClick={(e) => handleOptionClick(option)}
 								/>
 							))}
 					</ul>

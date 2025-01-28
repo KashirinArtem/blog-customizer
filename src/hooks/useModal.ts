@@ -1,35 +1,35 @@
 import { OnClick } from 'src/ui/arrow-button/ArrowButton';
-import { RefObject, useState } from 'react';
+import { useState, RefObject } from 'react';
 
 interface IModalAction {
-	isOpen: boolean;
+	isMenuOpen: boolean;
 	close: OnClick;
-	toggle: OnClick;
+	toggleMenu: () => void;
 }
 
 export function useModal(
 	initialState: boolean,
-	wrapperRef?: RefObject<HTMLElement>
+	wrapper: RefObject<HTMLElement>,
+	overlay: RefObject<HTMLElement>
 ): IModalAction {
-	const [isOpen, setIsOpen] = useState<boolean>(initialState);
+	const [isMenuOpen, setMenuOpen] = useState<boolean>(initialState);
 
 	function open(): void {
-		setIsOpen(true);
+		setMenuOpen(true);
 
-		wrapperRef && document.addEventListener('click', overlayHandler);
+		overlay.current?.addEventListener('click', overlayHandler);
 		document.addEventListener('keydown', handlerByEscape);
 	}
 
 	function close(): void {
-		setIsOpen(false);
+		setMenuOpen(false);
 
-		document.removeEventListener('click', overlayHandler);
+		overlay.current?.removeEventListener('click', overlayHandler);
 		document.removeEventListener('keydown', handlerByEscape);
 	}
 
-	function toggle(): void {
-		console.log(isOpen);
-		isOpen ? close() : open();
+	function toggleMenu(): void {
+		isMenuOpen ? close() : open();
 	}
 
 	function handlerByEscape(e: KeyboardEvent): void {
@@ -39,15 +39,16 @@ export function useModal(
 	}
 
 	function overlayHandler(e: MouseEvent): void {
-		e.stopPropagation();
+		const clickHasWrapper = wrapper.current?.contains(e.target as Node);
 
-		if (!wrapperRef?.current?.contains(e.target as HTMLElement)) return;
-		else open();
+		if (clickHasWrapper) return;
+
+		close();
 	}
 
 	return {
-		isOpen,
+		isMenuOpen,
 		close,
-		toggle,
+		toggleMenu,
 	};
 }

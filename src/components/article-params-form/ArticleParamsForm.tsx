@@ -12,18 +12,24 @@ import {
 	fontSizeOptions,
 	OptionType,
 } from 'src/constants/articleProps';
-import { useRef, useState } from 'react';
+import React, { RefObject, useRef, useState } from 'react';
 import { useModal } from 'src/hooks/useModal';
 import { Select } from 'src/ui/select';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
 import clsx from 'clsx';
+
 type ArticleParamsProps = {
 	applyState: (newState: ArticleStateType) => void;
+	overlay: RefObject<HTMLElement>;
 };
-export const ArticleParamsForm = ({ applyState }: ArticleParamsProps) => {
+
+export const ArticleParamsForm = ({
+	applyState,
+	overlay,
+}: ArticleParamsProps) => {
 	const wrapper = useRef<HTMLDivElement>(null)!;
-	const { isOpen, toggle } = useModal(false, wrapper);
+	const { isMenuOpen, toggleMenu } = useModal(false, wrapper, overlay);
 	const [formSetting, setFormSetting] =
 		useState<ArticleStateType>(defaultArticleState);
 
@@ -42,7 +48,7 @@ export const ArticleParamsForm = ({ applyState }: ArticleParamsProps) => {
 	const applyChanged = (e: React.FormEvent) => {
 		e.preventDefault();
 		applyState(formSetting);
-		toggle();
+		toggleMenu();
 	};
 
 	const selectHandler = (state: OptionType, type: string) => {
@@ -51,9 +57,11 @@ export const ArticleParamsForm = ({ applyState }: ArticleParamsProps) => {
 
 	return (
 		<div ref={wrapper}>
-			<ArrowButton isOpen={isOpen} onClick={toggle} />
+			<ArrowButton isOpen={isMenuOpen} onClick={toggleMenu} />
 			<aside
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
+				className={clsx(styles.container, {
+					[styles.container_open]: isMenuOpen,
+				})}>
 				<form className={styles.form} onSubmit={(e) => applyChanged(e)}>
 					<Text
 						as={'h2'}
